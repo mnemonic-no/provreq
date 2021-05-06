@@ -1,7 +1,7 @@
 # Adversary Emulation Planner
 
 This tool can be used to automatically build an ordered set of attack stages
-with Mitre ATT&CK techniques executed during each stage.
+with [MITRE ATT&CK](https://attack.mitre.org/) techniques executed during each stage.
 
 The output is a set of attack stages that show all possible techniques that an
 adversary might execute during each stage.
@@ -144,7 +144,7 @@ aep-promise-usage
 
 ### Show Techniques
 
-Show summary based on Mitre ATT&CK technique ID.
+Show summary based on MITRE ATT&CK technique ID.
 
 ```bash
 aep-technique -t T1001
