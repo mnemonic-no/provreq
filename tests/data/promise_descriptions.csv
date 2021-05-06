@@ -1,0 +1,66 @@
+access_filesystem, Access to the files of a host (not execute code)
+access_memory, Provides memory access on the host
+access_network, Access to the internal network in the target infrastructure (normal send and receive network traffic)
+access_network_infrastructure, Access to internal network devices (switches\, routers\, firewalls) in the target infrastructure
+access_network_intercept, Ability to read\, write\, delete\, intercept network traffic between other hosts in the target infrastructure
+access_password_store, Access to password store on a host
+access_physical, Physical access to a host (e.g. the ability to plug in peripheral devices)
+adversary_controlled_communication_channel, Provides an adversary controlled communication channel between the inside of an organization's network and the adversary's infrastructure - previous name command_and_control
+code_executed, The adversary has executed code (e.g. malware or a tool/utility that is built-in to the target system) - previous name execute_code
+credentials_2fa_token, Provides two-factor token
+credentials_admin_domain, Provides valid admin credentials (domain-wide)
+credentials_admin_local, Provides valid admin credentials (on local host)
+credentials_user_domain, Provides valid user credentials (domain-wide)
+credentials_user_local, Provides valid user credentials (on local host)
+credentials_user_thirdparty, Provides valid user credentials for a third party service (usually on network/in the cloud)
+credentials_users, Provides access to credentials of multiple users
+defense_evasion, Provides a way to avoid detection
+exploit_available, Exploit available to adversary
+exploit_delivery, Provides delivery of payload (exploit) to target system
+fast_flux, Fast flux
+file_transfer, Ability to transfer a file from one system to another (within an organization's network or to/from an organization's network and the outside)
+info_cloud_hosts, Provides knowledge of instances -  virtual machines - and snapshots in a cloud environment
+info_cloud_services, Provides knowledge of cloud services including the storage and database services
+info_domain_trust, Provides knowledge of domain trust relationships that may be used to identify lateral movement opportunities in Windows multi-domain/forest environments
+info_email_address, Provides a valid email address in use by someone in the target organization
+info_groupname, List of valid groupnames/accounts on a system or within an environment
+info_network_config, Knowledge of relevant network configuration
+info_network_hosts, Provides knowledge of hosts on the network
+info_network_services, Provides list of available network connections to or from a compromised system
+info_network_shares, Provides list of available network shares
+info_network_trust, Before compromising a victim\, adversaries may gather information about the victim's network trust dependencies that can be used during targeting. Information about network trusts may include a variety of details\, including second or third-party organizations/domains (ex: managed service providers\, contractors\, etc.) that have connected (and potentially elevated) network access.
+info_password_policy, Provides knowledge of the password policy used within an enterprise network
+info_peripheral_devices, Provides knowledge of attached peripheral devices and components connected to a host
+info_process_info, List of processes on a host
+info_target_information, Information on where the information you need is located.
+info_service_info, List of registered services
+info_system_time, Provides knowledge of the system time and/or time zone from a local or remote system
+info_target_employee, Knowledge about who to target in an organization
+info_username, List of valid usernames/accounts on a system or within an environment
+info_vulnerability, List of vulnerable hosts/services on a system or within an environment
+infrastructure_botnet, Bot net either self hosted or hired used to stage large distributed attacks
+infrastructure_certificate, Certificate trusted by victim
+infrastructure_domain, Domain name used in attack
+infrastructure_server," Server used to host code\, webservers\, staging\, command and control etc."
+infrastructure_trusted_email_account, Account of trusted person or third party used in staging an attack
+infrastructure_trusted_social_media, Accounts or platfroms of trusted third party
+moved_laterally, The adversary has compromised several different systems in the target infrastructure
+objective_denial_of_service, Stop or limit access to services\, machines or network.
+objective_destruction, Destroy data or other objective
+objective_exfiltration, Successful attack and end of attack chain (exfiltration)
+objective_extortion,Provides the positibility to extort a victim
+objective_integrity, Manipulate data in order to affect decision making
+objective_resources_computational,Access to computational resources (e.g. cryptocurrency mining)
+persistence, Persistence within a target organization's network
+privileges_admin_domain, Provides escalated privileges (domain-wide)
+privileges_admin_local, Provides escalated privileges (on local host)
+privileges_system_local, Provides system privileges (on local host)
+privileges_user_domain, Provides user privileges (domain-wide)
+privileges_user_local, Provides user privileges (on local host)
+privileges_user_thirdparty, Provides user privileges for a third party service (usually on network/in the cloud)
+privileges_users, Provides user privileges for multiple users
+staged_data, Data is stored between gathering and exfiltration
+target_information, Provides the information that the adversary is after (objective/goal)
+tool_available, Tool available to adversary
+tool_delivery, Provides adversary tool on target system
+waterhole, Functioning waterhole

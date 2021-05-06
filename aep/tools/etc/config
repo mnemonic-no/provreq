@@ -1,0 +1,23 @@
+###
+### Adversary Emulation Planner (AEP) config
+###
+
+[DEFAULT]
+
+### Root data directory
+data-dir = .
+
+promise-descriptions = promise_descriptions.csv
+conditions = conditions.csv
+technique-promises = technique_promises.json
+
+[generate]
+seeds=
+show-promises=True
+nop-empty-provides=
+show-tactics=
+include-tools=
+end-condition=
+include-techniques=
+exclude-techniques=
+system-conditions=

@@ -1,0 +1,5 @@
+poor_policy, Immature policy
+poor_infrastructure, Immature segmentation or security architecture
+poor_security_practices, Immature users or administrators leaving unnecessary traces
+previous_compromise, For example credentials on pastebin
+skilled_attacker, Very skilled attacker with advanced resources
