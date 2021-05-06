@@ -6,10 +6,6 @@ with [MITRE ATT&CK](https://attack.mitre.org/) techniques executed during each s
 The output is a set of attack stages that show all possible techniques that an
 adversary might execute during each stage.
 
-```
-The Adversary Emulation Planner is developed in the SOCCRATES innovation project (<https://soccrates.eu>). SOCCRATES has received funding from the European Union’s Horizon 2020 Research and Innovation program under Grant Agreement No. 833481.
-```
-
 ## Installation
 
 Install using pip:
@@ -241,3 +237,7 @@ aep-config user
 ```
 
 which will create default settings in ~/.config/aep/config.
+
+## About
+
+The Adversary Emulation Planner is developed in the SOCCRATES innovation project (<https://soccrates.eu>). SOCCRATES has received funding from the European Union’s Horizon 2020 Research and Innovation program under Grant Agreement No. 833481.
