@@ -6,6 +6,7 @@ import argparse
 import sys
 from collections import OrderedDict
 from pathlib import Path
+from typing import Dict, Text
 
 import tabulate
 
@@ -27,6 +28,10 @@ def command_line_arguments() -> argparse.Namespace:
     parser.add_argument('--include-tools', action='store_true',
                         help="Include techniques for threat actor that "
                              "is inherited from tools used")
+    parser.add_argument('--no-names', action='store_true',
+                        help="Only list technique IDs. This may be usefull on smaller screens.")
+    parser.add_argument('--text-length', type=int, default=10,
+                        help="Number of char before cutting down texh length in output, default=10")
 
     args: argparse.Namespace = config.handle_args(parser, "show-bundle")
 
@@ -37,12 +42,31 @@ def command_line_arguments() -> argparse.Namespace:
     return args
 
 
-def main():
+def shorten(data: Text, n: int = 10) -> Text:
+    """Shorten a string if it is long and n, adding ellipsis to show shortening"""
+
+    if len(data) <= n:
+        return data
+    else:
+        return f"{data[:n]}..."
+
+
+def format(ID: Text, technique: Dict, n: int = 10, ID_only: bool = False) -> Text:
+    """Format a technique ID + name for output. n is the number of charcters
+    include from ID and Name"""
+
+    if ID_only:
+        return shorten(ID, n)
+
+    return f"{shorten(ID, n)} [{shorten(technique['name'], n)}]"
+
+
+def main() -> None:
     """main entry"""
 
     args = command_line_arguments()
 
-    tactics = OrderedDict()
+    tactics: OrderedDict = OrderedDict()
     tactics["Reconnaissance"] = []
     tactics["Resource Development"] = []
     tactics["Initial Access"] = []
@@ -60,24 +84,11 @@ def main():
 
     techniques, tech_bundle = config.read_data(args)
 
-
-    # Expand subtechniques -> techniques
-    expanded = {}
-    # for k in techniques:
-    #    for subtech in techniques[k]['subtechniques']:
-    #        newtech = techniques[k].copy()
-    #        newtech.pop('subtechniques')
-    #        prefix = newtech['name']
-    #        newtech.update(techniques[k]['subtechniques'][subtech])
-    #        newtech['name'] = prefix + ":" + newtech['name']
-    #        expanded.update({subtech: newtech})
-    # techniques.update(expanded)
-
     for tech in tech_bundle:
         tech_dict = techniques[tech]
         for tactic in tech_dict["tactic"]:
             tactics[tactic].append(
-                f'{tech[:10]} [{tech_dict["name"][:10]}...]')
+                format(tech, tech_dict, args.text_length, args.no_names))
 
     print(tabulate.tabulate(tactics,
                             headers=tactics.keys(),
