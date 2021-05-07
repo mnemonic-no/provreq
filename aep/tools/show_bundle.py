@@ -45,10 +45,10 @@ def command_line_arguments() -> argparse.Namespace:
 def shorten(data: Text, n: int = 10) -> Text:
     """Shorten a string if it is long and n, adding ellipsis to show shortening"""
 
-    if len(data) <= n:
+    if len(data) <= n or n < 5:
         return data
     else:
-        return f"{data[:n]}..."
+        return f"{data[:n - 3]}..."
 
 
 def format(ID: Text, technique: Dict, n: int = 10, ID_only: bool = False) -> Text:
