@@ -6,6 +6,8 @@ with [MITRE ATT&CK](https://attack.mitre.org/) techniques executed during each s
 The output is a set of attack stages that show all possible techniques that an
 adversary might execute during each stage.
 
+To decide when the different techniques are to be found in such a set, `promises` are used as access tokens for execution of techniques. Each technique defines the set of promises required to execute it (think pre-conditions) and the set of promises it provides upon execution (think post-conditions).  
+
 ## Installation
 
 Install using pip:
