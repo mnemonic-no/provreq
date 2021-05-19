@@ -11,7 +11,7 @@ with open(path.join(this_directory, 'README.md'), "rb") as f:
 
 setup(
     name="aep",
-    version="0.1.2",
+    version="0.1.3",
     author="mnemonic AS",
     zip_safe=True,
     author_email="opensource@mnemonic.no",
