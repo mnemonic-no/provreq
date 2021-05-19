@@ -6,14 +6,12 @@ actor"""
 import argparse
 import sys
 from pathlib import Path
-from typing import Dict, List, Set, Text, Tuple
 
 import tabulate
 
 from aep.tools import config
 from aep.tools.libs.data import nop_techniques
-from aep.tools.libs.libgenerate import simulate
-from aep.tools.libs.types import AttackStage, Simulation
+from aep.tools.libs.libgenerate import simulate, stages_table
 
 
 def command_line_arguments() -> argparse.Namespace:
@@ -96,11 +94,13 @@ def main() -> None:
         args.system_conditions if args.system_conditions else {}
     )
 
-    print(stages_table(
+    table = stages_table(
         sim,
         techniques,
         args.show_promises,
-        args.show_tactics))
+        args.show_tactics)
+
+    print(tabulate.tabulate(table, headers="keys", tablefmt="fancy_grid"))
 
     print("[*] Technique does not provide any new promises")
 
@@ -114,71 +114,6 @@ def main() -> None:
     else:
         print(f"FAIL: incomplete attack chain, "
               f"could not achieve end condition: {args.end_condition}")
-
-
-def stage_technique(
-        technique: Dict,
-        last_stage_sum_provides: Set[Text],
-        show_tactics: bool) -> Text:
-    """ Get description of technique """
-
-    description: Text = technique["name"]
-    tactics = technique.get("tactic", [])
-
-    # Append comma seprated list of tactics after technique name
-    if show_tactics and tactics:
-        description += " (" + ",".join(tactics) + ")"
-
-    if all(provides in last_stage_sum_provides
-           for provides in technique["provides"]):
-        description += " [*]"
-
-    return description
-
-
-def stages_table(
-        sim: Simulation,
-        techniques: Dict,
-        show_promises: bool = False,
-        show_tactics: bool = False,
-        table_format: Text = "fancy_grid") -> Text:
-    """ Return tabulate formated stages """
-
-    table = []
-
-    for idx, stage in enumerate(sim.stages):
-        stage_tactics: Set[Text] = set()
-        tech_descriptions: Set[Text] = set()
-
-        for tech_id in stage.techniques:
-
-            if tech_id.startswith("_"):
-                # Skip shadow techniques
-                continue
-
-            technique = techniques[tech_id]
-            stage_tactics.update(technique.get("tactic", []))
-            tech_descriptions.add(
-                stage_technique(
-                    technique,
-                    stage.last_stage_sum_provides,
-                    show_tactics))
-
-        row = {
-            "stage": idx+1,
-            "techniques": "\n".join(sorted(tech_descriptions)),
-        }
-
-        if show_promises:
-            row["new promises @end-of-stage"] = "\n".join(
-                sorted(stage.new_provides))
-
-        if show_tactics:
-            row["tactics"] = "\n".join(sorted(stage_tactics))
-
-        table.append(row)
-
-    return tabulate.tabulate(table, headers="keys", tablefmt=table_format)
 
 
 if __name__ == "__main__":
