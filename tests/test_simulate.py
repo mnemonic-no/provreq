@@ -7,10 +7,10 @@ import aep.tools.libs.types as types
 
 def test_simulate() -> None:
     tech_promises, tech_bundle = data.read_data(
-        Path("tests/data/technique_bundle.json"),
         Path("tests/data/technique_promises.json"),
         Path("tests/data/promise_descriptions.csv"),
         Path("tests/data/conditions.csv"),
+        data.read_tech_bundle(Path("tests/data/technique_bundle.json"))
         )
 
     tech_bundle += ["T1046", "T1583"]

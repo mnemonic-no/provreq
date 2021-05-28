@@ -148,12 +148,16 @@ def read_technique_promises(args: argparse.Namespace):
 def read_data(args: argparse.Namespace):
     """ Wrapper for data.read_data() that uses parameters from config and verifies whether the file exists """
 
+    tech_bundle = aep.tools.libs.data.read_tech_bundle(
+        file_exists_or_die(
+            args.data_dir / args.technique_bundle,
+            "technique-bundle does not exist",
+        ),
+        include_tool_techniques=args.include_tools,
+    )
+
     # Resolve files relative to args.data_dir and exit if they do not exist
     return aep.tools.libs.data.read_data(
-        tech_bundle_file=file_exists_or_die(
-            args.data_dir / args.technique_bundle,
-            "technique-promises file does not exist",
-        ),
         tech_promises_file=file_exists_or_die(
             args.data_dir / args.technique_promises,
             "technique-promises file does not exist",
@@ -165,7 +169,7 @@ def read_data(args: argparse.Namespace):
         conditions_file=file_exists_or_die(
             args.data_dir / args.conditions, "promise-descripion file does not exist"
         ),
-        include_tool_techniques=args.include_tools,
+        tech_bundle=tech_bundle,
     )
 
 

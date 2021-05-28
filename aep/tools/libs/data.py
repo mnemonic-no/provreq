@@ -137,42 +137,41 @@ def read_technique_promises(
 
     return techniques, expand_map, ok
 
+def read_tech_bundle(tech_bundle_file: Path, include_tool_techniques: bool = False) -> List[Text]:
+    tech_bundle = json.loads(open(tech_bundle_file).read())
+
+    # Should we include techniques inherited from tools used by threat actor?
+    if include_tool_techniques:
+        return list(set(tech_bundle["techniques"] + tech_bundle["tool_techniques"]))
+    return list(set(tech_bundle["techniques"]))
+
 
 def read_data(
-        tech_bundle_file: Path,
         tech_promises_file: Path,
         promise_descriptions_file: Path,
         conditions_file: Path,
-        include_tool_techniques: bool = False) -> Tuple[Dict, List[Text]]:
-    """Read a threat actor file along with the techniques file"""
+        tech_bundle: List[Text]) -> Tuple[Dict, List[Text]]:
+    """Read a threat actor file along with the technique_promises file"""
 
-    techniques, expand_map, ok = read_technique_promises(
+    technique_promises, expand_map, ok = read_technique_promises(
         tech_promises_file,
         promise_descriptions_file,
         conditions_file)
 
-    tech_bundle = json.loads(open(tech_bundle_file).read())
-
-    # Should we inlcude techniques inherited from tools used by threat actor?
-    if include_tool_techniques:
-        tech_bundle = list(set(tech_bundle["techniques"] + tech_bundle["tool_techniques"]))
-    else:
-        tech_bundle = list(set(tech_bundle["techniques"]))
-
-    missing, ok = find_missing_techniques(techniques, tech_bundle)
+    missing, ok = find_missing_techniques(technique_promises, tech_bundle)
     if not ok:
         # TODO: add logging
         # print(f"WARNING: removing Threat Actor techniques {sorted(missing)}. "
         #       "Not present in techniques.json")
         tech_bundle = [x for x in tech_bundle if x not in missing]
 
-    tech_bundle_conditionals = copy.deepcopy(tech_bundle)
+    techniques_conditionals = copy.deepcopy(tech_bundle)
 
     for tat in tech_bundle:
         if tat in expand_map:
-            tech_bundle_conditionals.extend(expand_map[tat])
+            techniques_conditionals.extend(expand_map[tat])
 
-    return techniques, tech_bundle_conditionals
+    return technique_promises, techniques_conditionals
 
 
 def levenshtein(a: Text, b: Text) -> int:
