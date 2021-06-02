@@ -5,7 +5,7 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import Text
+from typing import Text, Tuple, Dict, List
 
 import caep
 from pkg_resources import resource_string
@@ -113,6 +113,12 @@ def handle_args(parser: argparse.ArgumentParser, tool: Text) -> argparse.Namespa
     return args
 
 
+def fatal(message: Text, exit_code: int = 1) -> None:
+    """ Print message to stderr and exit with status code """
+    sys.stderr.write(message.strip() + "\n")
+    sys.exit(exit_code)
+
+
 def file_exists_or_die(filename, message):
     """
     Expand filename and check if it exsists.
@@ -120,8 +126,7 @@ def file_exists_or_die(filename, message):
     """
     filename = filename.expanduser().resolve()
     if not filename.is_file():
-        sys.stderr.write(f"{message}: {filename}\n")
-        sys.exit(1)
+        fatal(f"{message}: {filename}\n")
 
     return filename
 
@@ -145,10 +150,10 @@ def read_technique_promises(args: argparse.Namespace):
     )
 
 
-def read_data(args: argparse.Namespace):
+def read_data(args: argparse.Namespace) -> Tuple[Dict, List[Text]]:
     """ Wrapper for data.read_data() that uses parameters from config and verifies whether the file exists """
 
-    tech_bundle = aep.tools.libs.data.read_tech_bundle(
+    techniques = aep.tools.libs.data.read_tech_bundle(
         file_exists_or_die(
             args.data_dir / args.technique_bundle,
             "technique-bundle does not exist",
@@ -156,21 +161,17 @@ def read_data(args: argparse.Namespace):
         include_tool_techniques=args.include_tools,
     )
 
-    # Resolve files relative to args.data_dir and exit if they do not exist
-    return aep.tools.libs.data.read_data(
-        tech_promises_file=file_exists_or_die(
-            args.data_dir / args.technique_promises,
-            "technique-promises file does not exist",
-        ),
-        promise_descriptions_file=file_exists_or_die(
-            args.data_dir / args.promise_descriptions,
-            "promise-descripion file does not exist",
-        ),
-        conditions_file=file_exists_or_die(
-            args.data_dir / args.conditions, "promise-descripion file does not exist"
-        ),
-        tech_bundle=tech_bundle,
-    )
+    technique_promises, expand_map, ok = read_technique_promises(args)
+
+    if not ok:
+        fatal(f"One or more technique in {args.technique_promises} are missing a required field")
+
+    techniques = aep.tools.libs.data.preprocess_techniques(
+        technique_promises,
+        expand_map,
+        techniques)
+
+    return technique_promises, techniques
 
 
 def main() -> None:

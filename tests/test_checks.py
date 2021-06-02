@@ -39,13 +39,10 @@ def test_check_techniques():
 
 
 def test_missing_techniques():
-    missing, ok = data.find_missing_techniques(
+    removed = data.remove_missing_techniques(
         techniques, ["test1", "test2"])
-    assert ok
-    assert not missing
+    assert removed == ["test1", "test2"]
 
-    missing, ok = data.find_missing_techniques(
+    removed = data.remove_missing_techniques(
         techniques, ["test1", "test2", "test3"])
-    assert not ok
-    assert "test3" in missing
-    assert len(missing) == 1
+    assert removed == ["test1", "test2"]
