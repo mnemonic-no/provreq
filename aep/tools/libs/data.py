@@ -203,6 +203,8 @@ def remove_missing_techniques(technique_promises: Dict,
     described in 'tech_bundle' is present in the techniques
     description and remove those that are not present"""
 
+    # TODO: add logging if we remove techniques
+
     return [tech for tech in techniques if tech in technique_promises]
 
 
