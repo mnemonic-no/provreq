@@ -7,15 +7,16 @@ import aep.tools.libs.data as data
 
 
 def test_read_files() -> None:
-    technique_promises, technique_bundle = data.read_data(
-        Path("tests/data/technique_bundle.json"),
+
+    technique_promises, expand_map, ok = data.read_technique_promises(
         Path("tests/data/technique_promises.json"),
         Path("tests/data/promise_descriptions.csv"),
         Path("tests/data/conditions.csv"),
-        )
+    )
 
-    assert isinstance(technique_bundle, list)
     assert isinstance(technique_promises, dict)
+    assert isinstance(expand_map, dict)
+    assert isinstance(ok, bool)
 
 
 def test_read_promise_descriptions():

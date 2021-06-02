@@ -138,41 +138,41 @@ def read_technique_promises(
     return techniques, expand_map, ok
 
 
-def read_data(
-        tech_bundle_file: Path,
-        tech_promises_file: Path,
-        promise_descriptions_file: Path,
-        conditions_file: Path,
-        include_tool_techniques: bool = False) -> Tuple[Dict, List[Text]]:
-    """Read a threat actor file along with the techniques file"""
-
-    techniques, expand_map, ok = read_technique_promises(
-        tech_promises_file,
-        promise_descriptions_file,
-        conditions_file)
-
+def read_tech_bundle(tech_bundle_file: Path, include_tool_techniques: bool = False) -> List[Text]:
+    """ Read technique bundle from file """
     tech_bundle = json.loads(open(tech_bundle_file).read())
 
-    # Should we inlcude techniques inherited from tools used by threat actor?
+    # Should we include techniques inherited from tools used by threat actor?
     if include_tool_techniques:
-        tech_bundle = list(set(tech_bundle["techniques"] + tech_bundle["tool_techniques"]))
-    else:
-        tech_bundle = list(set(tech_bundle["techniques"]))
+        return list(set(tech_bundle["techniques"] + tech_bundle["tool_techniques"]))
+    return list(set(tech_bundle["techniques"]))
 
-    missing, ok = find_missing_techniques(techniques, tech_bundle)
-    if not ok:
-        # TODO: add logging
-        # print(f"WARNING: removing Threat Actor techniques {sorted(missing)}. "
-        #       "Not present in techniques.json")
-        tech_bundle = [x for x in tech_bundle if x not in missing]
 
-    tech_bundle_conditionals = copy.deepcopy(tech_bundle)
+def preprocess_techniques(
+        technique_promises: Dict,
+        expand_map: Dict,
+        techniques: List[Text]) -> List[Text]:
+    """
+    Preprocess techniques:
+        - remove techniques that no longer exist in techniques_promises
+        - expand conditional techniques
+    """
 
-    for tat in tech_bundle:
+    techniques = remove_missing_techniques(technique_promises, techniques)
+    techniques = expand_conditionals(expand_map, techniques)
+
+    return techniques
+
+
+def expand_conditionals(expand_map: Dict, techniques: List[Text]) -> List[Text]:
+    """ Expand conditional techniques """
+    techniques_conditionals = copy.deepcopy(techniques)
+
+    for tat in techniques:
         if tat in expand_map:
-            tech_bundle_conditionals.extend(expand_map[tat])
+            techniques_conditionals.extend(expand_map[tat])
 
-    return techniques, tech_bundle_conditionals
+    return techniques_conditionals
 
 
 def levenshtein(a: Text, b: Text) -> int:
@@ -197,16 +197,15 @@ def levenshtein(a: Text, b: Text) -> int:
     return current[n]
 
 
-def find_missing_techniques(techniques: Dict,
-                            tech_bundle: List[Text]) -> Tuple[List[Text], bool]:
+def remove_missing_techniques(technique_promises: Dict,
+                              techniques: List[Text]) -> List[Text]:
     """Check that all the techniques used by TA (as
     described in 'tech_bundle' is present in the techniques
-    description"""
+    description and remove those that are not present"""
 
-    missing = [k for k in tech_bundle if k not in techniques]
-    ok = not bool(missing)
+    # TODO: add logging if we remove techniques
 
-    return missing, ok
+    return [tech for tech in techniques if tech in technique_promises]
 
 
 def create_conditional_techniques(techniques: Dict) -> Tuple[Dict, Dict]:
