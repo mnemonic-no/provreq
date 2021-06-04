@@ -2,7 +2,6 @@
 """ Handle worker config"""
 
 import argparse
-import functools
 import os
 import sys
 from pathlib import Path
@@ -139,7 +138,6 @@ def read_technique_promises(args: argparse.Namespace):
         fatal(str(error))
 
 
-@functools.lru_cache()
 def read_technique_promises_raise_error(args: argparse.Namespace):
     """ Wrapper for data.read_data() that uses parameters from config and verifies whether the file exists """
 
