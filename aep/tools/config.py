@@ -119,32 +119,39 @@ def fatal(message: Text, exit_code: int = 1) -> None:
     sys.exit(exit_code)
 
 
-def file_exists_or_die(filename, message):
+def file_exists_or_exception(filename: Path, message: Text) -> Path:
     """
     Expand filename and check if it exsists.
     Return expanded filename on success, otherwise it exits
     """
     filename = filename.expanduser().resolve()
     if not filename.is_file():
-        fatal(f"{message}: {filename}\n")
+        raise FileNotFoundError(f"{message}: {filename}\n")
 
     return filename
 
 
 def read_technique_promises(args: argparse.Namespace):
+    try:
+        return read_technique_promises_raise_error(args)
+    except FileNotFoundError as error:
+        fatal(str(error))
+
+
+def read_technique_promises_raise_error(args: argparse.Namespace):
     """ Wrapper for data.read_data() that uses parameters from config and verifies whether the file exists """
 
     # Resolve files relative to args.data_dir and exit if they do not exist
     return aep.tools.libs.data.read_technique_promises(
-        tech_promises_file=file_exists_or_die(
+        tech_promises_file=file_exists_or_exception(
             args.data_dir / args.technique_promises,
             "technique-promises file does not exist",
         ),
-        promise_descriptions_file=file_exists_or_die(
+        promise_descriptions_file=file_exists_or_exception(
             args.data_dir / args.promise_descriptions,
             "promise-descripion file does not exist",
         ),
-        conditions_file=file_exists_or_die(
+        conditions_file=file_exists_or_exception(
             args.data_dir / args.conditions, "promise-descripion file does not exist"
         ),
     )
@@ -153,13 +160,16 @@ def read_technique_promises(args: argparse.Namespace):
 def read_data(args: argparse.Namespace) -> Tuple[Dict, List[Text]]:
     """ Wrapper for data.read_data() that uses parameters from config and verifies whether the file exists """
 
-    techniques = aep.tools.libs.data.read_tech_bundle(
-        file_exists_or_die(
-            args.data_dir / args.technique_bundle,
-            "technique-bundle does not exist",
-        ),
-        include_tool_techniques=args.include_tools,
-    )
+    try:
+        techniques = aep.tools.libs.data.read_tech_bundle(
+            file_exists_or_exception(
+                args.data_dir / args.technique_bundle,
+                "technique-bundle does not exist",
+            ),
+            include_tool_techniques=args.include_tools,
+        )
+    except FileNotFoundError as error:
+        fatal(str(error))
 
     technique_promises, expand_map, ok = read_technique_promises(args)
 
