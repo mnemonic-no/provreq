@@ -77,7 +77,7 @@ def common_args(description: Text) -> argparse.ArgumentParser:
     parser.add_argument(
         "--config-dir",
         default=caep.get_config_dir("aep"),
-        help="Default config dir with configurations for scio and plugins",
+        help="Default direction for configuration files",
     )
 
     parser.add_argument(
