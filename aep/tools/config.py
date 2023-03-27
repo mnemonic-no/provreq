@@ -17,7 +17,7 @@ CONFIG_NAME = "config"
 
 
 def parseargs() -> argparse.Namespace:
-    """ Parse arguments """
+    """Parse arguments"""
 
     parser = argparse.ArgumentParser(
         "aep config",
@@ -40,14 +40,12 @@ def parseargs() -> argparse.Namespace:
 
 
 def default_config() -> Text:
-    "Get content of default config "
-    return resource_string("aep.tools", "etc/{}".format(CONFIG_NAME)).decode(
-        "utf-8"
-    )
+    "Get content of default config"
+    return resource_string("aep.tools", "etc/{}".format(CONFIG_NAME)).decode("utf-8")
 
 
 def save_config(filename: Text) -> None:
-    """ Save config to specified filename """
+    """Save config to specified filename"""
     if os.path.isfile(filename):
         sys.stderr.write(f"Config already exists: {filename}\n")
         sys.exit(1)
@@ -63,7 +61,7 @@ def save_config(filename: Text) -> None:
 
 
 def split_arg(argument, delimiter=","):
-    """ Split argument with delimiter and return list """
+    """Split argument with delimiter and return list"""
     if not argument:
         return []
 
@@ -71,7 +69,7 @@ def split_arg(argument, delimiter=","):
 
 
 def common_args(description: Text) -> argparse.ArgumentParser:
-    """ Parse default arguments """
+    """Parse default arguments"""
     parser = argparse.ArgumentParser(description=description)
 
     parser.add_argument(
@@ -114,7 +112,7 @@ def handle_args(parser: argparse.ArgumentParser, tool: Text) -> argparse.Namespa
 
 
 def fatal(message: Text, exit_code: int = 1) -> None:
-    """ Print message to stderr and exit with status code """
+    """Print message to stderr and exit with status code"""
     sys.stderr.write(message.strip() + "\n")
     sys.exit(exit_code)
 
@@ -132,7 +130,7 @@ def file_exists_or_die(filename, message):
 
 
 def read_technique_promises(args: argparse.Namespace):
-    """ Wrapper for data.read_data() that uses parameters from config and verifies whether the file exists """
+    """Wrapper for data.read_data() that uses parameters from config and verifies whether the file exists"""
 
     # Resolve files relative to args.data_dir and exit if they do not exist
     return aep.tools.libs.data.read_technique_promises(
@@ -151,7 +149,7 @@ def read_technique_promises(args: argparse.Namespace):
 
 
 def read_data(args: argparse.Namespace) -> Tuple[Dict, List[Text]]:
-    """ Wrapper for data.read_data() that uses parameters from config and verifies whether the file exists """
+    """Wrapper for data.read_data() that uses parameters from config and verifies whether the file exists"""
 
     techniques = aep.tools.libs.data.read_tech_bundle(
         file_exists_or_die(
@@ -164,12 +162,13 @@ def read_data(args: argparse.Namespace) -> Tuple[Dict, List[Text]]:
     technique_promises, expand_map, ok = read_technique_promises(args)
 
     if not ok:
-        fatal(f"One or more technique in {args.technique_promises} are missing a required field")
+        fatal(
+            f"One or more technique in {args.technique_promises} are missing a required field"
+        )
 
     techniques = aep.tools.libs.data.preprocess_techniques(
-        technique_promises,
-        expand_map,
-        techniques)
+        technique_promises, expand_map, techniques
+    )
 
     return technique_promises, techniques
 

@@ -26,32 +26,58 @@ def command_line_arguments() -> argparse.Namespace:
         help="The threat actor file to simulate",
     )
 
-    parser.add_argument('--seeds', type=config.split_arg,
-                        help="Entry conditions 'already in place'")
-    parser.add_argument('--end-condition', type=str,
-                        default="objective_exfiltration",
-                        help="What condition is the desired outcome")
-    parser.add_argument('--include-techniques', type=config.split_arg,
-                        help="Include the following techniques in the "
-                             "simulation as accessible to the attacker")
-    parser.add_argument('--exclude-techniques', type=config.split_arg,
-                        help=("Exclude the following techniques from "
-                              "the simulation even if accessible to "
-                              "the attacker"))
-    parser.add_argument('--show-promises', action='store_true',
-                        help="Show available promises on each stage")
-    parser.add_argument('--show-tactics', action='store_true',
-                        help="Show tactics in paranthesis after techniques "
-                             "and the set of all tactics at each stage in a column")
-    parser.add_argument('--nop-empty-provides', action='store_true',
-                        help="Do not check requires for empty list. "
-                             "Remove techniques with empty provides only.")
-    parser.add_argument('--include-tools', action='store_true',
-                        help="Include techniques for threat actor that "
-                             "is inherited from tools used")
-    parser.add_argument('--system-conditions', type=config.split_arg,
-                        help="List of conditions related to the "
-                             "system (e.g. poor_security_practices)")
+    parser.add_argument(
+        "--seeds", type=config.split_arg, help="Entry conditions 'already in place'"
+    )
+    parser.add_argument(
+        "--end-condition",
+        type=str,
+        default="objective_exfiltration",
+        help="What condition is the desired outcome",
+    )
+    parser.add_argument(
+        "--include-techniques",
+        type=config.split_arg,
+        help="Include the following techniques in the "
+        "simulation as accessible to the attacker",
+    )
+    parser.add_argument(
+        "--exclude-techniques",
+        type=config.split_arg,
+        help=(
+            "Exclude the following techniques from "
+            "the simulation even if accessible to "
+            "the attacker"
+        ),
+    )
+    parser.add_argument(
+        "--show-promises",
+        action="store_true",
+        help="Show available promises on each stage",
+    )
+    parser.add_argument(
+        "--show-tactics",
+        action="store_true",
+        help="Show tactics in paranthesis after techniques "
+        "and the set of all tactics at each stage in a column",
+    )
+    parser.add_argument(
+        "--nop-empty-provides",
+        action="store_true",
+        help="Do not check requires for empty list. "
+        "Remove techniques with empty provides only.",
+    )
+    parser.add_argument(
+        "--include-tools",
+        action="store_true",
+        help="Include techniques for threat actor that " "is inherited from tools used",
+    )
+    parser.add_argument(
+        "--system-conditions",
+        type=config.split_arg,
+        help="List of conditions related to the "
+        "system (e.g. poor_security_practices)",
+    )
 
     args: argparse.Namespace = config.handle_args(parser, "generate")
 
@@ -69,8 +95,7 @@ def main() -> None:
 
     techniques, tech_bundle = config.read_data(args)
 
-    nops = nop_techniques(
-        techniques, ['defense_evasion'], args.nop_empty_provides)
+    nops = nop_techniques(techniques, ["defense_evasion"], args.nop_empty_provides)
     removed = []
     for tat in tech_bundle[:]:
         if tat in nops:
@@ -91,29 +116,28 @@ def main() -> None:
         args.seeds,
         tech_bundle,
         techniques,
-        args.system_conditions if args.system_conditions else {}
+        args.system_conditions if args.system_conditions else {},
     )
 
-    table = stages_table(
-        sim,
-        techniques,
-        args.show_promises,
-        args.show_tactics)
+    table = stages_table(sim, techniques, args.show_promises, args.show_tactics)
 
     print(tabulate.tabulate(table, headers="keys", tablefmt="fancy_grid"))
 
     print("[*] Technique does not provide any new promises")
 
     if sim.objectives:
-        print(
-            f"The following objectives where reached: {sorted(sim.objectives)}")
+        print(f"The following objectives where reached: {sorted(sim.objectives)}")
 
     if args.end_condition in sim.provided:
-        print(f"SUCCESS: Attack chain exited with "
-              f"end condition '{args.end_condition}'")
+        print(
+            f"SUCCESS: Attack chain exited with "
+            f"end condition '{args.end_condition}'"
+        )
     else:
-        print(f"FAIL: incomplete attack chain, "
-              f"could not achieve end condition: {args.end_condition}")
+        print(
+            f"FAIL: incomplete attack chain, "
+            f"could not achieve end condition: {args.end_condition}"
+        )
 
 
 if __name__ == "__main__":
