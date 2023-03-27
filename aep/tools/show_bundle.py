@@ -25,14 +25,23 @@ def command_line_arguments() -> argparse.Namespace:
         help="The threat actor file to simulate",
     )
 
-    parser.add_argument('--include-tools', action='store_true',
-                        help="Include techniques for threat actor that "
-                             "is inherited from tools used")
-    parser.add_argument('--no-names', action='store_true',
-                        help="Only list technique IDs. This may be usefull on smaller screens.")
-    parser.add_argument('--text-length', type=int, default=10,
-                        help="Number of char before cutting down texh length in output, "
-                             "default=10, min=5")
+    parser.add_argument(
+        "--include-tools",
+        action="store_true",
+        help="Include techniques for threat actor that " "is inherited from tools used",
+    )
+    parser.add_argument(
+        "--no-names",
+        action="store_true",
+        help="Only list technique IDs. This may be usefull on smaller screens.",
+    )
+    parser.add_argument(
+        "--text-length",
+        type=int,
+        default=10,
+        help="Number of char before cutting down texh length in output, "
+        "default=10, min=5",
+    )
 
     args: argparse.Namespace = config.handle_args(parser, "show-bundle")
 
@@ -92,11 +101,10 @@ def main() -> None:
         tech_dict = techniques[tech]
         for tactic in tech_dict["tactic"]:
             tactics[tactic].append(
-                format(tech, tech_dict, args.text_length, args.no_names))
+                format(tech, tech_dict, args.text_length, args.no_names)
+            )
 
-    print(tabulate.tabulate(tactics,
-                            headers=tactics.keys(),
-                            tablefmt="fancy_grid"))
+    print(tabulate.tabulate(tactics, headers=tactics.keys(), tablefmt="fancy_grid"))
 
 
 if __name__ == "__main__":

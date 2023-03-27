@@ -14,12 +14,20 @@ def command_line_arguments() -> argparse.Namespace:
 
     parser = config.common_args("Show little or unused promises")
 
-    parser.add_argument("-rl", "--requirelimit", type=int, default=0,
-                        help="Show promises with required count "
-                             "less than or equal to this")
-    parser.add_argument("-pl", "--providelimit", type=int, default=0,
-                        help="Show promises with provided count "
-                             "less than or equal to this")
+    parser.add_argument(
+        "-rl",
+        "--requirelimit",
+        type=int,
+        default=0,
+        help="Show promises with required count " "less than or equal to this",
+    )
+    parser.add_argument(
+        "-pl",
+        "--providelimit",
+        type=int,
+        default=0,
+        help="Show promises with provided count " "less than or equal to this",
+    )
 
     return config.handle_args(parser, "promise-usage")
 
@@ -29,8 +37,12 @@ def main() -> None:
 
     args = command_line_arguments()
 
-    prepost = {promise: desc for promise, desc in csv.reader(
-        open(args.data_dir / args.promise_descriptions), escapechar='\\')}
+    prepost = {
+        promise: desc
+        for promise, desc in csv.reader(
+            open(args.data_dir / args.promise_descriptions), escapechar="\\"
+        )
+    }
 
     provides = defaultdict(int)
     requires = defaultdict(int)
@@ -42,9 +54,9 @@ def main() -> None:
     techniques, _, _ = config.read_technique_promises(args)
 
     for technique in techniques.values():
-        for provide in technique['provides']:
+        for provide in technique["provides"]:
             provides[provide] += 1
-        for require in technique['requires']:
+        for require in technique["requires"]:
             requires[require] += 1
 
     output = set()
@@ -57,10 +69,13 @@ def main() -> None:
 
     outputlist = [list(x) for x in output]
 
-    print(tabulate.tabulate(
-        outputlist,
-        headers=["promise", "provides", "requires"],
-        tablefmt="fancy_grid"))
+    print(
+        tabulate.tabulate(
+            outputlist,
+            headers=["promise", "provides", "requires"],
+            tablefmt="fancy_grid",
+        )
+    )
 
 
 if __name__ == "__main__":

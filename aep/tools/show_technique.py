@@ -29,15 +29,25 @@ def command_line_arguments() -> argparse.Namespace:
 def show_technique(technique: Dict[Text, Dict]) -> None:
     """Pretty print a technique"""
 
-    headers = ["Provides", "Requires",
-               "Tactic(s)", "Relevant", "Conditionals", "Subtechniques"]
+    headers = [
+        "Provides",
+        "Requires",
+        "Tactic(s)",
+        "Relevant",
+        "Conditionals",
+        "Subtechniques",
+    ]
 
-    output = [["\n".join(technique['provides']),
-               "\n".join(technique["requires"]),
-               "\n".join(technique['tactic']),
-               "\n".join(technique['relevant_for']),
-               "\n".join(technique.get('conditional_provides', {}).keys()),
-               "\n".join(x['name'] for x in technique.get('subtechniques', {}).values())]]
+    output = [
+        [
+            "\n".join(technique["provides"]),
+            "\n".join(technique["requires"]),
+            "\n".join(technique["tactic"]),
+            "\n".join(technique["relevant_for"]),
+            "\n".join(technique.get("conditional_provides", {}).keys()),
+            "\n".join(x["name"] for x in technique.get("subtechniques", {}).values()),
+        ]
+    ]
 
     print("+++")
     print("\t" + technique["name"])
