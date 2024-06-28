@@ -265,17 +265,17 @@ def nop_agents(
 
     nops = set()
 
-    for agent in agents:
-        agent = copy.deepcopy(agents[agent])
+    for agent_name in agents:
+        agent = copy.deepcopy(agents[agent_name])
         for noped_promise in noped_promises:
             agent["requires"] = _without(noped_promise, agent["requires"])
             agent["provides"] = _without(noped_promise, agent["provides"])
 
         if nop_empty_provides:
             if not agent["provides"]:
-                nops.add(agent)
+                nops.add(agent_name)
         else:
             if not agent["requires"] and not agent["provides"]:
-                nops.add(agent)
+                nops.add(agent_name)
 
     return nops

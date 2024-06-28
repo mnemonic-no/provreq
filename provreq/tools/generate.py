@@ -68,9 +68,10 @@ def command_line_arguments() -> argparse.Namespace:
         "Remove agents with empty provides only.",
     )
     parser.add_argument(
-        "--include-tools",
+        "--include-extended-agents",
         action="store_true",
-        help="Include agents for threat actor that " "is inherited from tools used",
+        help="Include agents for threat actor that "
+        "is inherited from extended agents used",
     )
     parser.add_argument(
         "--system-conditions",

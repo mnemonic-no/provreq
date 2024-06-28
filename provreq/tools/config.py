@@ -5,7 +5,7 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import Text, Tuple, Dict, List
+from typing import Dict, List, Text, Tuple
 
 import caep
 from pkg_resources import resource_string
@@ -41,7 +41,9 @@ def parseargs() -> argparse.Namespace:
 
 def default_config() -> Text:
     "Get content of default config"
-    return resource_string("provreq.tools", "etc/{}".format(CONFIG_NAME)).decode("utf-8")
+    return resource_string("provreq.tools", "etc/{}".format(CONFIG_NAME)).decode(
+        "utf-8"
+    )
 
 
 def save_config(filename: Text) -> None:
@@ -156,7 +158,7 @@ def read_data(args: argparse.Namespace) -> Tuple[Dict, List[Text]]:
             args.data_dir / args.agent_bundle,
             "agent-bundle does not exist",
         ),
-        include_tool_agents=args.include_tools,
+        include_extended_agents=args.include_extended_agents,
     )
 
     agent_promises, expand_map, ok = read_agent_promises(args)
