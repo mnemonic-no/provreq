@@ -1,12 +1,11 @@
 # Provreq
 
-This tool can be used to automatically build an ordered set of attack stages
-with [MITRE ATT&CK](https://attack.mitre.org/) techniques executed during each stage.
+This tool can be used to automatically build an ordered set of executed agents.
 
-The output is a set of attack stages that show all possible techniques that an
-adversary might execute during each stage.
+The output is a set of agents that show all possible combinations of agents paths
+based on a set of pre-requisit and post conditions.
 
-To decide when the different techniques are to be found in such a set, `promises` are used as access tokens for execution of techniques. Each technique defines the set of promises required to execute it (think pre-conditions) and the set of promises it provides upon execution (think post-conditions).
+To decide when the different agents are to be found in such a set, `promises` are used as access tokens for execution of and agent. Each agent defines the set of promises required to execute it (think pre-conditions) and the set of promises it provides upon execution (think post-conditions).
 
 ## Installation
 
@@ -29,7 +28,7 @@ these commands in that repository, since you need access to default dat files.
 `provreq-generate` is where you should start and the other tools are more useful if you start making changes to the
 data itself.
 
-### Generate Adversary Emulation Plan
+### Generate Adversary Emulation Plan (based on the AEP data set)
 
 ```bash
 $ provreq-generate --end-condition objective_exfiltration --include-agents T1021,T1046,T1583 --agent-bundle incident/UNC2452-Solorigate.json --show-promises
