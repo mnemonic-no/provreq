@@ -24,7 +24,7 @@ setup(
         "console_scripts": [
             "provreq-generate = provreq.tools.generate:main",
             "provreq-promise-usage = provreq.tools.promise_usage:main",
-            "provreq-technique = provreq.tools.show_technique:main",
+            "provreq-agent = provreq.tools.show_agent:main",
             "provreq-promise = provreq.tools.show_promise:main",
             "provreq-bundle = provreq.tools.show_bundle:main",
             "provreq-promise-search = provreq.tools.promise_search:main",
