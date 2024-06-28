@@ -1,4 +1,4 @@
-# Adversary Emulation Planner
+# Provreq
 
 This tool can be used to automatically build an ordered set of attack stages
 with [MITRE ATT&CK](https://attack.mitre.org/) techniques executed during each stage.
