@@ -1,5 +1,5 @@
 ###
-### Adversary Emulation Planner (AEP) config
+### Provreq config
 ###
 
 [DEFAULT]
@@ -9,15 +9,15 @@ data-dir = .
 
 promise-descriptions = promise_descriptions.csv
 conditions = conditions.csv
-technique-promises = technique_promises.json
+agents-promises = agent_promises.json
 
 [generate]
 seeds=
 show-promises=True
 nop-empty-provides=
-show-tactics=
-include-tools=
+show-agent=
+include-extended-agents=
 end-condition=
-include-techniques=
-exclude-techniques=
+include-agents=
+exclude-agents=
 system-conditions=

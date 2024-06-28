@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class AttackStage(BaseModel):
     """Attack Stage"""
 
-    techniques: Set[Text]
+    agents: Set[Text]
     new_provides: Set[Text]
     last_stage_sum_provides: Set[Text]
 
