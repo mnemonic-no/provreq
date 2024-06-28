@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Technique Show utility"""
+"""agent Show utility"""
 
 import argparse
 import sys
@@ -7,62 +7,62 @@ from typing import Dict, Text
 
 import tabulate
 
-from aep.tools import config
+from provreq.tools import config
 
 
 def command_line_arguments() -> argparse.Namespace:
     """Parse the command line arguments"""
 
-    parser = config.common_args("Show a technique")
+    parser = config.common_args("Show a agent")
 
-    parser.add_argument("-t", "--technique", type=str, help="Technique to show")
+    parser.add_argument("-t", "--agent", type=str, help="agent to show")
 
-    args = config.handle_args(parser, "show-technique")
+    args = config.handle_args(parser, "show-agent")
 
-    if not args.technique:
-        sys.stderr.write("Specify technique with -t [TECHNIQUE_ID]\n")
+    if not args.agent:
+        sys.stderr.write("Specify agent with -t [agent_ID]\n")
         sys.exit(1)
 
     return args
 
 
-def show_technique(technique: Dict[Text, Dict]) -> None:
-    """Pretty print a technique"""
+def show_agent(agent: Dict[Text, Dict]) -> None:
+    """Pretty print a agent"""
 
     headers = [
         "Provides",
         "Requires",
-        "Tactic(s)",
+        "agent_class(s)",
         "Relevant",
         "Conditionals",
-        "Subtechniques",
+        "Children",
     ]
 
     output = [
         [
-            "\n".join(technique["provides"]),
-            "\n".join(technique["requires"]),
-            "\n".join(technique["tactic"]),
-            "\n".join(technique["relevant_for"]),
-            "\n".join(technique.get("conditional_provides", {}).keys()),
-            "\n".join(x["name"] for x in technique.get("subtechniques", {}).values()),
+            "\n".join(agent["provides"]),
+            "\n".join(agent["requires"]),
+            "\n".join(agent["agent_class"]),
+            "\n".join(agent["relevant_for"]),
+            "\n".join(agent.get("conditional_provides", {}).keys()),
+            "\n".join(x["name"] for x in agent.get("subagents", {}).values()),
         ]
     ]
 
     print("+++")
-    print("\t" + technique["name"])
+    print("\t" + agent["name"])
     print(tabulate.tabulate(output, headers=headers, tablefmt="fancy_grid"))
 
 
 def main():
     args = command_line_arguments()
 
-    tech, _, _ = config.read_technique_promises(args)
+    agent, _, _ = config.read_agent_promises(args)
 
-    if not args.technique.startswith("T"):
-        args.technique = "T" + args.technique
+    if not args.agent.startswith("T"):
+        args.agent = "T" + args.agent
 
-    show_technique(tech[args.technique])
+    show_agent(agent[args.agent])
 
 
 if __name__ == "__main__":
