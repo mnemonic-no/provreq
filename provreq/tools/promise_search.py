@@ -6,7 +6,7 @@ from typing import Dict, List, Text
 
 import tabulate
 
-from aep.tools import config
+from provreq.tools import config
 
 """Techniques Search utility"""
 
@@ -14,37 +14,37 @@ from aep.tools import config
 def command_line_arguments() -> argparse.Namespace:
     """Parse the command line arguments"""
 
-    parser = config.common_args("Search techniques")
+    parser = config.common_args("Search agents")
 
     parser.add_argument(
         "-p",
         "--provides",
         type=config.split_arg,
-        help="Search for techniques providing these promises",
+        help="Search for agents providing these promises",
     )
     parser.add_argument(
         "-np",
         "--notprovides",
         type=config.split_arg,
-        help="Search for techniques that does _not_ provide promises",
+        help="Search for agents that does _not_ provide promises",
     )
     parser.add_argument(
         "-r",
         "--requires",
         type=config.split_arg,
-        help="Search for techniques requires these promises",
+        help="Search for agents requires these promises",
     )
     parser.add_argument(
         "-nr",
         "--notrequires",
         type=config.split_arg,
-        help="Search for techniques that does _not_ require promises",
+        help="Search for agents that does _not_ require promises",
     )
     parser.add_argument(
         "-n",
         "--name",
         type=config.split_arg,
-        help="Search for techniques whos name contains this string",
+        help="Search for agents whos name contains this string",
     )
 
     args = config.handle_args(parser, "promise-search")
@@ -62,10 +62,10 @@ def command_line_arguments() -> argparse.Namespace:
     return args
 
 
-def show_techniques(techniques: Dict[Text, Dict]) -> None:
+def show_agents(agents: Dict[Text, Dict]) -> None:
     headers = ["ID", "Name", "Tactic(s)"]
 
-    output = [(k, v["name"], "\n".join(v["tactic"])) for k, v in techniques.items()]
+    output = [(k, v["name"], "\n".join(v["agent_class"])) for k, v in agents.items()]
 
     print(tabulate.tabulate(output, headers=headers, tablefmt="fancy_grid"))
     print(f"n={len(output)}")
@@ -87,36 +87,36 @@ def main():
 
     args = command_line_arguments()
 
-    tech, _, _ = config.read_technique_promises(args)
+    agent, _, _ = config.read_agent_promises(args)
 
     if args.provides:
-        tech = {k: v for k, v in tech.items() if contains(args.provides, v["provides"])}
+        agent = {k: v for k, v in agent.items() if contains(args.provides, v["provides"])}
 
     if args.notprovides:
-        tech = {
+        agent = {
             k: v
-            for k, v in tech.items()
+            for k, v in agent.items()
             if not contains(args.notprovides, v["provides"])
         }
 
     if args.requires:
-        tech = {k: v for k, v in tech.items() if contains(args.requires, v["requires"])}
+        agent = {k: v for k, v in agent.items() if contains(args.requires, v["requires"])}
 
     if args.notrequires:
-        tech = {
+        agent = {
             k: v
-            for k, v in tech.items()
+            for k, v in agent.items()
             if not contains(args.notrequires, v["requires"])
         }
 
     if args.name:
-        tech = {
+        agent = {
             k: v
-            for k, v in tech.items()
+            for k, v in agent.items()
             if any(name in v["name"].lower() for name in args.name)
         }
 
-    show_techniques(tech)
+    show_agents(agent)
 
 
 if __name__ == "__main__":

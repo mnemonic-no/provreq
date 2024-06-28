@@ -5,34 +5,34 @@ import sys
 from typing import Dict, Text
 
 
-def check_unreachable(techniques: Dict[Text, Dict]) -> bool:
-    """Check for techniques that can not be reached without seeding the simulation
-    e.g. no techniques provides the promise a technique requires"""
+def check_unreachable(agents: Dict[Text, Dict]) -> bool:
+    """Check for agents that can not be reached without seeding the simulation
+    e.g. no agents provides the promise a agent requires"""
 
     normal_provides = set()
     conditional_provides = set()
 
     ok = True
 
-    # Genereate a list of all provided promises in techniques, subtechniques and
+    # Genereate a list of all provided promises in agents, children and
     # conditional provides
-    for tech in techniques.values():
-        normal_provides.update(set(tech["provides"]))
-        if tech["subtechniques"]:
-            for subtech in tech["subtechniques"].values():
-                normal_provides.update(set(subtech.get("provides", [])))
-        if tech["conditional_provides"]:
-            for provides in tech["conditional_provides"]:
+    for agent in agents.values():
+        normal_provides.update(set(agent["provides"]))
+        if agent["children"]:
+            for child in agent["children"].values():
+                normal_provides.update(set(child.get("provides", [])))
+        if agent["conditional_provides"]:
+            for provides in agent["conditional_provides"]:
                 conditional_provides.update(set(provides))
 
     with_conditional_provides = set()
     with_conditional_provides.update(normal_provides)
     with_conditional_provides.update(conditional_provides)
 
-    # Run through all techniques to check if what they require is actually provided by 'something'
-    for tid, tech in techniques.items():
-        if not all(req in normal_provides for req in tech["requires"]):
-            if all(req in with_conditional_provides for req in tech["requires"]):
+    # Run through all agents to check if what they require is actually provided by 'something'
+    for tid, agent in agents.items():
+        if not all(req in normal_provides for req in agent["requires"]):
+            if all(req in with_conditional_provides for req in agent["requires"]):
                 print(
                     f"Warning: {tid} can only be reached through conditional provides"
                 )
@@ -40,11 +40,11 @@ def check_unreachable(techniques: Dict[Text, Dict]) -> bool:
                 print(f"Warning: {tid} can not be reached without seeding")
                 ok = False
 
-        for stid, subtech in tech["subtechniques"].items():
-            if not all(req in normal_provides for req in subtech.get("requires", [])):
+        for stid, child in agent["children"].items():
+            if not all(req in normal_provides for req in child.get("requires", [])):
                 if all(
                     req in with_conditional_provides
-                    for req in subtech.get("requires", [])
+                    for req in child.get("requires", [])
                 ):
                     print(
                         f"Warning: {stid} can only be reached through conditional provides"

@@ -1,6 +1,6 @@
-import aep.tools.libs.data as data
+import provreq.tools.libs.data as data
 
-techniques = {
+agents = {
     "test1": {
         "name": "test1",
         "requires": [],
@@ -15,7 +15,7 @@ techniques = {
     }
 }
 
-bad_techniques = {
+bad_agents = {
     "test1": {
         "name": "test1",
         "provides": ["test_prom1"]
@@ -27,22 +27,22 @@ bad_techniques = {
 }
 
 
-def test_check_techniques():
+def test_check_agents():
 
-    missing, ok = data.check_techniques(techniques)
+    missing, ok = data.check_agents(agents)
     assert ok
     assert not missing
 
-    missing, ok = data.check_techniques(bad_techniques)
+    missing, ok = data.check_agents(bad_agents)
     assert not ok
     assert missing
 
 
-def test_missing_techniques():
+def test_missing_agents():
 
     original = ["test1", "test2"]
-    filtered = data.remove_missing_techniques(techniques, original)
+    filtered = data.remove_missing_agents(agents, original)
     assert filtered == original
 
-    filtered = data.remove_missing_techniques(techniques, original + ["test3"])
+    filtered = data.remove_missing_agents(agents, original + ["test3"])
     assert filtered == original

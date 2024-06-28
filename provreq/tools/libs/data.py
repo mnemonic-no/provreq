@@ -8,30 +8,30 @@ from typing import Dict, List, Set, Text, TextIO, Tuple
 import tabulate
 
 
-def expand_techniques(techniques: Dict) -> Dict:
-    """Expand subtechniques -> techniques"""
+def expand_agents(agents: Dict) -> Dict:
+    """Expand children -> agents"""
 
     expanded = {}
-    for k in techniques:
-        for subtech in techniques[k]["subtechniques"]:
-            newtech = copy.deepcopy(techniques[k])
-            newtech.pop("subtechniques")
-            prefix = newtech["name"]
-            newtech.update(techniques[k]["subtechniques"][subtech])
-            newtech["name"] = prefix + ":" + newtech["name"]
-            expanded.update({subtech: newtech})
+    for k in agents:
+        for child in agents[k]["children"]:
+            newagent = copy.deepcopy(agents[k])
+            newagent.pop("children")
+            prefix = newagent["name"]
+            newagent.update(agents[k]["children"][child])
+            newagent["name"] = prefix + ":" + newagent["name"]
+            expanded.update({child: newagent})
     return expanded
 
 
-def check_techniques(techniques: Dict) -> Tuple[List, bool]:
-    """Check each technique description for the
+def check_agents(agents: Dict) -> Tuple[List, bool]:
+    """Check each agent description for the
     correct structure (must contain name, requires
     and provides"""
 
     missing = []
     ok = True
     req_keys = ["name", "requires", "provides", "conditional_provides"]
-    for k, v in techniques.items():
+    for k, v in agents.items():
         for rk in req_keys:
             if rk not in v:
                 print(f"{k} missing key {rk}")
@@ -41,19 +41,19 @@ def check_techniques(techniques: Dict) -> Tuple[List, bool]:
 
 
 def check_promise_description(
-    techniques: Dict, promise_description: Set[Text]
+    agents: Dict, promise_description: Set[Text]
 ) -> Set[Text]:
     """
-    Get list of promise_description used in techniques
+    Get list of promise_description used in agents
     that are not defined in condition vocabulary
     """
 
     missing = set()
     condition_keys = ["requires", "provides"]
-    for _, technique in techniques.items():
+    for _, agent in agents.items():
         for key in condition_keys:
             missing.update(
-                [cond for cond in technique[key] if cond not in promise_description]
+                [cond for cond in agent[key] if cond not in promise_description]
             )
     return missing
 
@@ -83,7 +83,7 @@ def print_condition_suggestion_and_die(
     exitcode 2"""
 
     sys.stderr.write(
-        "Conditions in techniques not specified in " + "condition vocabulary\n"
+        "Conditions in agents not specified in " + "condition vocabulary\n"
     )
     output_list = []
     for missing in missing_promise_description:
@@ -105,34 +105,32 @@ def print_condition_suggestion_and_die(
     sys.exit(2)
 
 
-def read_technique_promises(
-    tech_promises_file: Path, promise_descriptions_file: Path, conditions_file: Path
+def read_agent_promises(
+    agent_promises_file: Path, promise_descriptions_file: Path, conditions_file: Path
 ) -> Tuple[Dict, Dict, bool]:
-    """Read the techniques file"""
+    """Read the agents file"""
 
-    techniques: Dict = json.loads(open(tech_promises_file).read())
-    _, ok = check_techniques(techniques)
+    agents: Dict = json.loads(open(agent_promises_file).read())
+    _, ok = check_agents(agents)
 
-    expanded = expand_techniques(techniques)
-    techniques.update(expanded)
+    expanded = expand_agents(agents)
+    agents.update(expanded)
 
     with open(promise_descriptions_file) as pre_post_file:
         promise_description = read_promise_description_file(pre_post_file)
 
     # We need to check once for a match between the promise_description description
-    # file and the techniques pre-conditional expansen to verify that the
+    # file and the agents pre-conditional expansen to verify that the
     # system conditions used in conditional_provides is accidentally used in
     # provides and requires.
-    missing_promise_description = check_promise_description(
-        techniques, promise_description
-    )
+    missing_promise_description = check_promise_description(agents, promise_description)
     if missing_promise_description:
         print_condition_suggestion_and_die(
             missing_promise_description, promise_description
         )
 
-    created_conditional_tech, expand_map = create_conditional_techniques(techniques)
-    techniques.update(created_conditional_tech)
+    created_conditional_agent, expand_map = create_conditional_agents(agents)
+    agents.update(created_conditional_agent)
 
     with open(conditions_file) as cond_file:
         conditions = read_promise_description_file(cond_file)
@@ -141,7 +139,7 @@ def read_technique_promises(
     # conditions.csv as the system condtions is now used as provides and
     # requires based on the conditional_provides expansions.
     missing_promise_description = check_promise_description(
-        techniques, promise_description.union(conditions)
+        agents, promise_description.union(conditions)
     )
     if missing_promise_description:
         print_condition_suggestion_and_die(
@@ -149,47 +147,47 @@ def read_technique_promises(
         )
         ok = False
 
-    json.dump(techniques, open("test.json", "w"))
+    json.dump(agents, open("test.json", "w"))
 
-    return techniques, expand_map, ok
+    return agents, expand_map, ok
 
 
-def read_tech_bundle(
-    tech_bundle_file: Path, include_tool_techniques: bool = False
+def read_agent_bundle(
+    agent_bundle_file: Path, include_extended_agents: bool = False
 ) -> List[Text]:
-    """Read technique bundle from file"""
-    tech_bundle = json.loads(open(tech_bundle_file).read())
+    """Read agent bundle from file"""
+    agent_bundle = json.loads(open(agent_bundle_file).read())
 
-    # Should we include techniques inherited from tools used by threat actor?
-    if include_tool_techniques:
-        return list(set(tech_bundle["techniques"] + tech_bundle["tool_techniques"]))
-    return list(set(tech_bundle["techniques"]))
+    # Should we include agents inherited from extended agents?
+    if include_extended_agents:
+        return list(set(agent_bundle["agents"] + agent_bundle["extended_agents"]))
+    return list(set(agent_bundle["agents"]))
 
 
-def preprocess_techniques(
-    technique_promises: Dict, expand_map: Dict, techniques: List[Text]
+def preprocess_agents(
+    agent_promises: Dict, expand_map: Dict, agents: List[Text]
 ) -> List[Text]:
     """
-    Preprocess techniques:
-        - remove techniques that no longer exist in techniques_promises
-        - expand conditional techniques
+    Preprocess agents:
+        - remove agents that no longer exist in agents_promises
+        - expand conditional agents
     """
 
-    techniques = remove_missing_techniques(technique_promises, techniques)
-    techniques = expand_conditionals(expand_map, techniques)
+    agents = remove_missing_agents(agent_promises, agents)
+    agents = expand_conditionals(expand_map, agents)
 
-    return techniques
+    return agents
 
 
-def expand_conditionals(expand_map: Dict, techniques: List[Text]) -> List[Text]:
-    """Expand conditional techniques"""
-    techniques_conditionals = copy.deepcopy(techniques)
+def expand_conditionals(expand_map: Dict, agents: List[Text]) -> List[Text]:
+    """Expand conditional agents"""
+    agents_conditionals = copy.deepcopy(agents)
 
-    for tat in techniques:
+    for tat in agents:
         if tat in expand_map:
-            techniques_conditionals.extend(expand_map[tat])
+            agents_conditionals.extend(expand_map[tat])
 
-    return techniques_conditionals
+    return agents_conditionals
 
 
 def levenshtein(a: Text, b: Text) -> int:
@@ -214,51 +212,47 @@ def levenshtein(a: Text, b: Text) -> int:
     return current[n]
 
 
-def remove_missing_techniques(
-    technique_promises: Dict, techniques: List[Text]
-) -> List[Text]:
-    """Check that all the techniques used by TA (as
-    described in 'tech_bundle' is present in the techniques
+def remove_missing_agents(agent_promises: Dict, agents: List[Text]) -> List[Text]:
+    """Check that all the agents used by TA (as
+    described in 'agent_bundle' is present in the agents
     description and remove those that are not present"""
 
-    # TODO: add logging if we remove techniques
+    # TODO: add logging if we remove agents
 
-    return [tech for tech in techniques if tech in technique_promises]
+    return [agent for agent in agents if agent in agent_promises]
 
 
-def create_conditional_techniques(techniques: Dict) -> Tuple[Dict, Dict]:
-    """Expand conditional techniques"""
+def create_conditional_agents(agents: Dict) -> Tuple[Dict, Dict]:
+    """Expand conditional agents"""
 
-    # New conditional techniques created
+    # New conditional agents created
     expanded = {}
 
-    # a map used to extend the techniques used by a threat actor with
-    # conditional techniques created runtime
+    # a map used to extend the agents used by a threat actor with
+    # conditional agents created runtime
     expansion_map = {}
 
-    for k in techniques:
+    for k in agents:
         expanded_conditions = []
-        for conditional in techniques[k]["conditional_provides"]:
-            newtech = copy.deepcopy(techniques[k])
-            newtech.pop("conditional_provides")
-            newtech["name"] += f" [{conditional}]"
-            newtech["requires"].append(conditional)
-            newtech["provides"].extend(
-                techniques[k]["conditional_provides"][conditional]
-            )
-            newtech["requires"] = list(set(newtech["requires"]))
-            newtech["provides"] = list(set(newtech["provides"]))
+        for conditional in agents[k]["conditional_provides"]:
+            newagent = copy.deepcopy(agents[k])
+            newagent.pop("conditional_provides")
+            newagent["name"] += f" [{conditional}]"
+            newagent["requires"].append(conditional)
+            newagent["provides"].extend(agents[k]["conditional_provides"][conditional])
+            newagent["requires"] = list(set(newagent["requires"]))
+            newagent["provides"] = list(set(newagent["provides"]))
             new_id = k + "_" + conditional
-            expanded.update({new_id: newtech})
+            expanded.update({new_id: newagent})
             expanded_conditions.append(new_id)
         expansion_map[k] = expanded_conditions
     return expanded, expansion_map
 
 
-def nop_techniques(
-    techniques: Dict, noped_promises: List[Text], nop_empty_provides: bool = False
+def nop_agents(
+    agents: Dict, noped_promises: List[Text], nop_empty_provides: bool = False
 ) -> Set[Text]:
-    """Get a list of noped techniques"""
+    """Get a list of noped agents"""
 
     def _without(element: Text, lst: List[Text]) -> List[Text]:
         """remove an element from a list if presnet"""
@@ -271,17 +265,17 @@ def nop_techniques(
 
     nops = set()
 
-    for tech in techniques:
-        technique = copy.deepcopy(techniques[tech])
+    for agent in agents:
+        agent = copy.deepcopy(agents[agent])
         for noped_promise in noped_promises:
-            technique["requires"] = _without(noped_promise, technique["requires"])
-            technique["provides"] = _without(noped_promise, technique["provides"])
+            agent["requires"] = _without(noped_promise, agent["requires"])
+            agent["provides"] = _without(noped_promise, agent["provides"])
 
         if nop_empty_provides:
-            if not technique["provides"]:
-                nops.add(tech)
+            if not agent["provides"]:
+                nops.add(agent)
         else:
-            if not technique["requires"] and not technique["provides"]:
-                nops.add(tech)
+            if not agent["requires"] and not agent["provides"]:
+                nops.add(agent)
 
     return nops

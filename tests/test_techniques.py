@@ -1,21 +1,21 @@
 import json
 
-import aep.tools.libs.data as data
+import provreq.tools.libs.data as data
 
 
-def test_expand_subtechniques() -> None:
+def test_expand_subagents() -> None:
 
-    techniques = json.load(open("tests/data/technique_promises.json"))
+    agents = json.load(open("tests/data/agent_promises.json"))
 
-    expanded = data.expand_techniques(techniques)
+    expanded = data.expand_agents(agents)
 
     assert len(expanded) == 349
 
-    # Add the expanded subtechniques
-    techniques.update(expanded)
+    # Add the expanded subagents
+    agents.update(expanded)
 
-    expanded, expansion_map = data.create_conditional_techniques(
-        techniques)
+    expanded, expansion_map = data.create_conditional_agents(
+        agents)
 
     assert len(expanded) == 139
     assert len(expansion_map) == 525

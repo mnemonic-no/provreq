@@ -6,7 +6,7 @@ from collections import defaultdict
 
 import tabulate
 
-from aep.tools import config
+from provreq.tools import config
 
 
 def command_line_arguments() -> argparse.Namespace:
@@ -51,12 +51,12 @@ def main() -> None:
         provides[prom] = 0
         requires[prom] = 0
 
-    techniques, _, _ = config.read_technique_promises(args)
+    agents, _, _ = config.read_agent_promises(args)
 
-    for technique in techniques.values():
-        for provide in technique["provides"]:
+    for agent in agents.values():
+        for provide in agent["provides"]:
             provides[provide] += 1
-        for require in technique["requires"]:
+        for require in agent["requires"]:
             requires[require] += 1
 
     output = set()

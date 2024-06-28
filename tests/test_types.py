@@ -1,7 +1,7 @@
 import pydantic
 import pytest
 
-import aep.tools.libs.types as types
+import provreq.tools.libs.types as types
 
 
 def test_types() -> None:
@@ -10,9 +10,9 @@ def test_types() -> None:
         attack_stage = types.AttackStage()
 
     attack_stage = types.AttackStage(
-        techniques=[], new_provides=[], last_stage_sum_provides=[])
+        agents=[], new_provides=[], last_stage_sum_provides=[])
 
-    assert hasattr(attack_stage, "techniques")
+    assert hasattr(attack_stage, "agents")
     assert hasattr(attack_stage, "new_provides")
     assert hasattr(attack_stage, "last_stage_sum_provides")
 

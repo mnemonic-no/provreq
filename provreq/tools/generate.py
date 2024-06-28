@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Simulate a "run" through the techniques used by a threat
+"""Simulate a "run" through the agents used by a threat
 actor"""
 
 import argparse
@@ -9,9 +9,9 @@ from pathlib import Path
 
 import tabulate
 
-from aep.tools import config
-from aep.tools.libs.data import nop_techniques
-from aep.tools.libs.libgenerate import simulate, stages_table
+from provreq.tools import config
+from provreq.tools.libs.data import nop_agents
+from provreq.tools.libs.libgenerate import simulate, stages_table
 
 
 def command_line_arguments() -> argparse.Namespace:
@@ -21,7 +21,7 @@ def command_line_arguments() -> argparse.Namespace:
 
     parser.add_argument(
         "-b",
-        "--technique-bundle",
+        "--agent-bundle",
         type=Path,
         help="The threat actor file to simulate",
     )
@@ -36,16 +36,16 @@ def command_line_arguments() -> argparse.Namespace:
         help="What condition is the desired outcome",
     )
     parser.add_argument(
-        "--include-techniques",
+        "--include-agents",
         type=config.split_arg,
-        help="Include the following techniques in the "
+        help="Include the following agents in the "
         "simulation as accessible to the attacker",
     )
     parser.add_argument(
-        "--exclude-techniques",
+        "--exclude-agents",
         type=config.split_arg,
         help=(
-            "Exclude the following techniques from "
+            "Exclude the following agents from "
             "the simulation even if accessible to "
             "the attacker"
         ),
@@ -56,21 +56,21 @@ def command_line_arguments() -> argparse.Namespace:
         help="Show available promises on each stage",
     )
     parser.add_argument(
-        "--show-tactics",
+        "--show-agent_classes",
         action="store_true",
-        help="Show tactics in paranthesis after techniques "
-        "and the set of all tactics at each stage in a column",
+        help="Show agent_classes in paranthesis after agents "
+        "and the set of all agent_classes at each stage in a column",
     )
     parser.add_argument(
         "--nop-empty-provides",
         action="store_true",
         help="Do not check requires for empty list. "
-        "Remove techniques with empty provides only.",
+        "Remove agents with empty provides only.",
     )
     parser.add_argument(
         "--include-tools",
         action="store_true",
-        help="Include techniques for threat actor that " "is inherited from tools used",
+        help="Include agents for threat actor that " "is inherited from tools used",
     )
     parser.add_argument(
         "--system-conditions",
@@ -81,8 +81,8 @@ def command_line_arguments() -> argparse.Namespace:
 
     args: argparse.Namespace = config.handle_args(parser, "generate")
 
-    if not args.technique_bundle:
-        sys.stderr.write("--technique-bundle must be specified\n")
+    if not args.agent_bundle:
+        sys.stderr.write("--agent-bundle must be specified\n")
         sys.exit(1)
 
     return args
@@ -93,33 +93,33 @@ def main() -> None:
 
     args = command_line_arguments()
 
-    techniques, tech_bundle = config.read_data(args)
+    agents, agent_bundle = config.read_data(args)
 
-    nops = nop_techniques(techniques, ["defense_evasion"], args.nop_empty_provides)
+    nops = nop_agents(agents, ["defense_evasion"], args.nop_empty_provides)
     removed = []
-    for tat in tech_bundle[:]:
+    for tat in agent_bundle[:]:
         if tat in nops:
             removed.append(tat)
-            tech_bundle.remove(tat)
-    print(f"Removed {len(removed)} NOP techniques: {sorted(removed)}")
+            agent_bundle.remove(tat)
+    print(f"Removed {len(removed)} NOP agents: {sorted(removed)}")
 
-    if args.include_techniques:
-        tech_bundle.extend(args.include_techniques)
-    if args.exclude_techniques:
-        for exclude in args.exclude_techniques:
+    if args.include_agents:
+        agent_bundle.extend(args.include_agents)
+    if args.exclude_agents:
+        for exclude in args.exclude_agents:
             try:
-                tech_bundle.remove(exclude)
+                agent_bundle.remove(exclude)
             except ValueError:
-                print(f"{sorted(exclude)} is not in the list of techniques used")
+                print(f"{sorted(exclude)} is not in the list of agents used")
 
     sim = simulate(
         args.seeds,
-        tech_bundle,
-        techniques,
+        agent_bundle,
+        agents,
         args.system_conditions if args.system_conditions else {},
     )
 
-    table = stages_table(sim, techniques, args.show_promises, args.show_tactics)
+    table = stages_table(sim, agents, args.show_promises, args.show_agent_classes)
 
     print(tabulate.tabulate(table, headers="keys", tablefmt="fancy_grid"))
 

@@ -6,36 +6,36 @@ with [MITRE ATT&CK](https://attack.mitre.org/) techniques executed during each s
 The output is a set of attack stages that show all possible techniques that an
 adversary might execute during each stage.
 
-To decide when the different techniques are to be found in such a set, `promises` are used as access tokens for execution of techniques. Each technique defines the set of promises required to execute it (think pre-conditions) and the set of promises it provides upon execution (think post-conditions).  
+To decide when the different techniques are to be found in such a set, `promises` are used as access tokens for execution of techniques. Each technique defines the set of promises required to execute it (think pre-conditions) and the set of promises it provides upon execution (think post-conditions).
 
 ## Installation
 
 Install using pip:
 
 ```bash
-pip install aep
+pip install provreq
 ```
-You will also need to clone the [aep-data](https://github.com/mnemonic-no/aep-data) repository, which contains a starting point witch example data:
+If you are using this with the Adversary Emulation Planner data set, you need to clone the [aep](https://github.com/mnemonic-no/aep) repository, which contains a starting point witch example data:
 
 ```bash
-git clone https://github.com/mnemonic-no/aep-data
+git clone https://github.com/mnemonic-no/aep
 ```
 
 ## Usage/Examples
 
-If you have checked out the [aep-data](https://github.com/mnemonic-no/aep-data) repository you can run
+If you have checked out the [aep](https://github.com/mnemonic-no/aep) repository you can run
 these commands in that repository, since you need access to default dat files.
 
-`aep-generate` is where you should start and the other tools are more useful if you start making changes to the
+`provreq-generate` is where you should start and the other tools are more useful if you start making changes to the
 data itself.
 
 ### Generate Adversary Emulation Plan
 
 ```bash
-$ aep-generate --end-condition objective_exfiltration --include-techniques T1021,T1046,T1583 --technique-bundle incident/UNC2452-Solorigate.json --show-promises
-Removed 4 NOP techniques: ['T1036', 'T1036.004', 'T1036.005', 'T1083']
+$ provreq-generate --end-condition objective_exfiltration --include-agents T1021,T1046,T1583 --agent-bundle incident/UNC2452-Solorigate.json --show-promises
+Removed 4 NOP agents: ['T1036', 'T1036.004', 'T1036.005', 'T1083']
 ╒═════════╤══════════════════════════════════════════════════════════╤════════════════════════════════════════════╕
-│   stage │ techniques                                               │ new promises @end-of-stage                 │
+│   stage │ agents                                                   │ new promises @end-of-stage                 │
 ╞═════════╪══════════════════════════════════════════════════════════╪════════════════════════════════════════════╡
 │       1 │ Acquire Infrastructure                                   │ exploit_available                          │
 │         │ Develop Capabilities                                     │ info_domain_trust                          │
@@ -75,8 +75,8 @@ Removed 4 NOP techniques: ['T1036', 'T1036.004', 'T1036.005', 'T1083']
 │         │ Network Service Scanning                                 │                                            │
 │         │ Valid Accounts [*]                                       │                                            │
 ╘═════════╧══════════════════════════════════════════════════════════╧════════════════════════════════════════════╛
-[*] Technique does not provide any new promises
-FAIL: incomplete attack chain, could not achieve end condition: objective_exfiltration
+[*] Agents does not provide any new promises
+FAIL: incomplete chain, could not achieve end condition: objective_exfiltration
 ```
 
 ### Show Promise Usage
@@ -84,7 +84,7 @@ FAIL: incomplete attack chain, could not achieve end condition: objective_exfilt
 Show little or unused promises.
 
 ```bash
-aep-promise-usage
+provreq-promise-usage
 ╒══════════════════════════════════════╤════════════╤════════════╕
 │ promise                              │   provides │   requires │
 ╞══════════════════════════════════════╪════════════╪════════════╡
@@ -145,7 +145,7 @@ aep-promise-usage
 Show summary based on MITRE ATT&CK technique ID.
 
 ```bash
-aep-technique -t T1001
+provreq-agent -t T1001
 +++
         Data Obfuscation
 ╒═════════════════╤════════════════╤═════════════════════╤══════════════════════════════╤════════════════╤════════════════════════╕
@@ -177,7 +177,7 @@ aep-technique -t T1001
 ### Technique bundle summary
 
 ```bash
-aep-bundle -b incident/Ryuk-Bazar-Cobalt-Strike.json
+provreq-bundle -b incident/Ryuk-Bazar-Cobalt-Strike.json
 
 (...)
 ```
@@ -185,7 +185,7 @@ aep-bundle -b incident/Ryuk-Bazar-Cobalt-Strike.json
 ### Promise summary
 
 ```bash
-aep-promise --promise tool_delivery
+provreq-promise --promise tool_delivery
 
 (...)
 ```
@@ -195,11 +195,11 @@ aep-promise --promise tool_delivery
 Search promises based on specified criterias.
 
 ```bash
-aep-promise-search --help
-usage: aep-promise-search [-h] [--config-dir CONFIG_DIR] [--data-dir DATA_DIR]
+provreq-promise-search --help
+usage: provreq-promise-search [-h] [--config-dir CONFIG_DIR] [--data-dir DATA_DIR]
                           [--promise-descriptions PROMISE_DESCRIPTIONS]
                           [--conditions CONDITIONS]
-                          [--technique-promises TECHNIQUE_PROMISES]
+                          [--agent-promises AGENT_PROMISES]
                           [-p PROVIDES] [-np NOTPROVIDES] [-r REQUIRES]
                           [-nr NOTREQUIRES] [-n NAME]
 
@@ -215,7 +215,7 @@ optional arguments:
                         Promise description file (CSV)
   --conditions CONDITIONS
                         Conditions (CSV)
-  --technique-promises TECHNIQUE_PROMISES
+  --agent-promises TECHNIQUE_PROMISES
                         Path for techniques.json. Supports data relative to
                         root data directory and absolute path
   -p PROVIDES, --provides PROVIDES
@@ -235,11 +235,11 @@ optional arguments:
 This step is not necessary, but can be used to change default settings on the tools. Run with:
 
 ```bash
-aep-config user
+provreq-config user
 ```
 
-which will create default settings in ~/.config/aep/config.
+which will create default settings in ~/.config/provreq/config.
 
 ## About
 
-The Adversary Emulation Planner is developed in the SOCCRATES innovation project (<https://soccrates.eu>). SOCCRATES has received funding from the European Union’s Horizon 2020 Research and Innovation program under Grant Agreement No. 833481.
+Provreq is developed in the SOCCRATES innovation project (<https://soccrates.eu>). SOCCRATES has received funding from the European Union’s Horizon 2020 Research and Innovation program under Grant Agreement No. 833481.

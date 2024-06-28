@@ -10,9 +10,9 @@ from typing import Text, Tuple, Dict, List
 import caep
 from pkg_resources import resource_string
 
-import aep.tools.libs.data
+import provreq.tools.libs.data
 
-CONFIG_ID = "aep"
+CONFIG_ID = "provreq"
 CONFIG_NAME = "config"
 
 
@@ -20,7 +20,7 @@ def parseargs() -> argparse.Namespace:
     """Parse arguments"""
 
     parser = argparse.ArgumentParser(
-        "aep config",
+        "provreq config",
         epilog="""
     show - Print default config
 
@@ -41,7 +41,7 @@ def parseargs() -> argparse.Namespace:
 
 def default_config() -> Text:
     "Get content of default config"
-    return resource_string("aep.tools", "etc/{}".format(CONFIG_NAME)).decode("utf-8")
+    return resource_string("provreq.tools", "etc/{}".format(CONFIG_NAME)).decode("utf-8")
 
 
 def save_config(filename: Text) -> None:
@@ -74,7 +74,7 @@ def common_args(description: Text) -> argparse.ArgumentParser:
 
     parser.add_argument(
         "--config-dir",
-        default=caep.get_config_dir("aep"),
+        default=caep.get_config_dir("provreq"),
         help="Default directory for configuration files",
     )
 
@@ -91,10 +91,10 @@ def common_args(description: Text) -> argparse.ArgumentParser:
         "--conditions", type=Path, default="conditions.csv", help="Conditions (CSV)"
     )
     parser.add_argument(
-        "--technique-promises",
+        "--agent-promises",
         type=Path,
-        default="technique_promises.json",
-        help="Path for techniques.json. "
+        default="agent_promises.json",
+        help="Path for agents.json. "
         "Supports data relative to root data directory and absolute path",
     )
 
@@ -102,10 +102,10 @@ def common_args(description: Text) -> argparse.ArgumentParser:
 
 
 def handle_args(parser: argparse.ArgumentParser, tool: Text) -> argparse.Namespace:
-    args = caep.config.handle_args(parser, "aep", "config", tool)
+    args = caep.config.handle_args(parser, "provreq", "config", tool)
 
-    if not args.technique_promises:
-        sys.stderr.write("--technique-promises must be specified\n")
+    if not args.agent_promises:
+        sys.stderr.write("--agent-promises must be specified\n")
         sys.exit(1)
 
     return args
@@ -129,14 +129,14 @@ def file_exists_or_die(filename, message):
     return filename
 
 
-def read_technique_promises(args: argparse.Namespace):
+def read_agent_promises(args: argparse.Namespace):
     """Wrapper for data.read_data() that uses parameters from config and verifies whether the file exists"""
 
     # Resolve files relative to args.data_dir and exit if they do not exist
-    return aep.tools.libs.data.read_technique_promises(
-        tech_promises_file=file_exists_or_die(
-            args.data_dir / args.technique_promises,
-            "technique-promises file does not exist",
+    return provreq.tools.libs.data.read_agent_promises(
+        agent_promises_file=file_exists_or_die(
+            args.data_dir / args.agent_promises,
+            "agent-promises file does not exist",
         ),
         promise_descriptions_file=file_exists_or_die(
             args.data_dir / args.promise_descriptions,
@@ -151,26 +151,26 @@ def read_technique_promises(args: argparse.Namespace):
 def read_data(args: argparse.Namespace) -> Tuple[Dict, List[Text]]:
     """Wrapper for data.read_data() that uses parameters from config and verifies whether the file exists"""
 
-    techniques = aep.tools.libs.data.read_tech_bundle(
+    agents = provreq.tools.libs.data.read_agent_bundle(
         file_exists_or_die(
-            args.data_dir / args.technique_bundle,
-            "technique-bundle does not exist",
+            args.data_dir / args.agent_bundle,
+            "agent-bundle does not exist",
         ),
-        include_tool_techniques=args.include_tools,
+        include_tool_agents=args.include_tools,
     )
 
-    technique_promises, expand_map, ok = read_technique_promises(args)
+    agent_promises, expand_map, ok = read_agent_promises(args)
 
     if not ok:
         fatal(
-            f"One or more technique in {args.technique_promises} are missing a required field"
+            f"One or more agent in {args.agent_promises} are missing a required field"
         )
 
-    techniques = aep.tools.libs.data.preprocess_techniques(
-        technique_promises, expand_map, techniques
+    agents = provreq.tools.libs.data.preprocess_agents(
+        agent_promises, expand_map, agents
     )
 
-    return technique_promises, techniques
+    return agent_promises, agents
 
 
 def main() -> None:
