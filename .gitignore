@@ -134,3 +134,5 @@ dmypy.json
 tags
 
 test.json
+push.sh
+tests/data/*
