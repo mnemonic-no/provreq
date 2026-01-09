@@ -1,4 +1,3 @@
-import pytest
 
 import provreq.tools.libs.data as data
 

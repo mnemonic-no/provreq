@@ -11,7 +11,7 @@ with open(path.join(this_directory, "README.md"), "rb") as f:
 
 setup(
     name="provreq",
-    version="0.1.5",
+    version="0.1.6",
     author="mnemonic AS",
     zip_safe=True,
     author_email="opensource@mnemonic.no",

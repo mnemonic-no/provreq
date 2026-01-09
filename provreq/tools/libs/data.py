@@ -110,19 +110,25 @@ def read_agent_promises(
 ) -> Tuple[Dict, Dict, bool]:
     """Read the agents file"""
 
+    print("load", agent_promises_file)
     agents: Dict = json.loads(open(agent_promises_file).read())
+    print("check", agent_promises_file)
     _, ok = check_agents(agents)
 
+    print("Expand agent")
     expanded = expand_agents(agents)
+    print("Update agent")
     agents.update(expanded)
 
     with open(promise_descriptions_file) as pre_post_file:
+        print("read", promise_descriptions_file)
         promise_description = read_promise_description_file(pre_post_file)
 
     # We need to check once for a match between the promise_description description
     # file and the agents pre-conditional expansen to verify that the
     # system conditions used in conditional_provides is accidentally used in
     # provides and requires.
+    print("Check promise descriptions")
     missing_promise_description = check_promise_description(agents, promise_description)
     if missing_promise_description:
         print_condition_suggestion_and_die(

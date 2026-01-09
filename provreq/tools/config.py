@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" Handle worker config"""
+"""Handle worker config"""
 
 import argparse
 import os
@@ -104,7 +104,7 @@ def common_args(description: Text) -> argparse.ArgumentParser:
 
 
 def handle_args(parser: argparse.ArgumentParser, tool: Text) -> argparse.Namespace:
-    args = caep.config.handle_args(parser, "provreq", "config", tool)
+    args, _ = caep.config.handle_args(parser, "provreq", "config", tool)
 
     if not args.agent_promises:
         sys.stderr.write("--agent-promises must be specified\n")
